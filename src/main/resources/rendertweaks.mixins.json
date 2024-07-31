@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "dev.microcontrollers.rendertweaks.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "client": [
+    "LightningEntityRendererMixin",
+    "WorldRendererMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
