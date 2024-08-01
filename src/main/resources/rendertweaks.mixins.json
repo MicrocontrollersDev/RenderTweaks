@@ -3,6 +3,7 @@
   "package": "dev.microcontrollers.rendertweaks.mixin",
   "compatibilityLevel": "JAVA_17",
   "client": [
+    "FishingBobberEntityRendererMixin",
     "LightningEntityRendererMixin",
     "WorldRendererMixin"
   ],

@@ -38,6 +38,9 @@ loom {
 }
 
 dependencies {
+	// Mixin Extras because PGT includes an old one
+	implementation(annotationProcessor(libs.mixinextras.get())!!)
+
 	val modMenuVersion = when(platform.mcVersion) {
 		12001 -> "7.2.2"
 		12004 -> "9.2.0-beta.2"
