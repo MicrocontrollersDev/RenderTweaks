@@ -10,7 +10,10 @@ import net.minecraft.world.border.WorldBorder;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArgs;
+import org.spongepowered.asm.mixin.injection.Slice;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.awt.Color;
 
@@ -60,5 +63,43 @@ public class WorldRendererMixin {
             }
             default -> original;
         };
+    }
+
+    @ModifyArgs(method = "renderWeather", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;color(FFFF)Lnet/minecraft/client/render/VertexConsumer;"),
+            slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;vertex(FFF)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 0),
+            to = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;vertex(FFF)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 3, shift = At.Shift.AFTER)))
+    private void changeRainColor(Args args, @Cancellable CallbackInfo ci) {
+        if (config.disableRain) ci.cancel();
+        Color color = ColorUtil.getColor(
+                config.rainChroma,
+                config.rainColor,
+                config.rainSpeed,
+                config.rainSaturation,
+                config.rainBrightness,
+                config.rainAlpha
+        );
+        args.set(0, color.getRed() / 255F);
+        args.set(1, color.getGreen() / 255F);
+        args.set(2, color.getBlue() / 255F);
+        args.set(3, (float) args.get(3) * color.getAlpha());
+    }
+
+    @ModifyArgs(method = "renderWeather", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/VertexConsumer;color(FFFF)Lnet/minecraft/client/render/VertexConsumer;"),
+            slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;vertex(FFF)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 4),
+                    to = @At(value = "INVOKE", target = "Lnet/minecraft/client/render/BufferBuilder;vertex(FFF)Lnet/minecraft/client/render/VertexConsumer;", ordinal = 7, shift = At.Shift.AFTER)))
+    private void changeSnowColor(Args args, @Cancellable CallbackInfo ci) {
+        if (config.disableSnow) ci.cancel();
+        Color color = ColorUtil.getColor(
+                config.snowChroma,
+                config.snowColor,
+                config.snowSpeed,
+                config.snowSaturation,
+                config.snowBrightness,
+                config.snowAlpha
+        );
+        args.set(0, color.getRed() / 255F);
+        args.set(1, color.getGreen() / 255F);
+        args.set(2, color.getBlue() / 255F);
+        args.set(3, (float) args.get(3) * color.getAlpha());
     }
 }
